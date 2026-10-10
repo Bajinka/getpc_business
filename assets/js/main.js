@@ -161,7 +161,7 @@
       services: "GET-PC provides computer repair and maintenance, graphic design, website and database development, computer training, data entry, CV and document preparation, printing, and school IT support.",
       training: "There are three independent levels: Computer Fundamentals, Word, Excel, and PowerPoint; Graphic Design; and Web Development. You may choose one level on its own. Fees, dates, schedules, duration, and places are not confirmed.",
       register: "Account creation and course registration are handled through the existing Floot portal. This static website does not create accounts or accept applications.",
-      location: "GET-PC Technical Solution is based in Brikama, The Gambia. Use the Contact page for configured phone, WhatsApp, and email details."
+      location: "GET-PC Technical Solution is based in Brikama, The Gambia. Use the Google Maps link on the Contact page for directions."
     };
     helpPanel.querySelector(".quick-help-answer").textContent = answers[button.dataset.answer];
   });
