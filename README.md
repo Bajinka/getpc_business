@@ -1,47 +1,72 @@
 ﻿# GET-PC static website
 
-This folder is a standalone HTML, CSS, and vanilla JavaScript version of the GET-PC website. The published site does not use Next.js, React, Node.js, a database service, API routes, or a database. The original project has not been changed into this static site; this is a separate copy in `github-pages`.
+This website uses HTML, CSS, and JavaScript.
 
-## Preview with VS Code Live Server
+## Publishing
 
-1. Open the project folder in VS Code.
-2. Install the **Live Server** extension if needed.
-3. In Explorer, right-click `github-pages/index.html` and select **Open with Live Server**.
-4. Navigate through the site links. The HTML pages are also directly accessible at `services.html`, `training.html`, `staff.html`, `about.html`, `contact.html`, and `register.html`.
+Place these files in the root of the existing GitHub repository.
+Keep CNAME and .nojekyll.
 
-The relative page and asset paths work when the folder is served at a repository subpath as well as at a custom domain.
+The included .github/workflows/static.yml publishes the repository
+root when changes are pushed to main.
 
-## Configure contact and portal links
+For a local preview, open index.html using VS Code Live Server.
 
-Edit `assets/js/config.js` to change the displayed business contact methods and portal links:
+## Included features
 
-- `portalLoginUrl`: existing Floot sign-in page.
-- `portalRegistrationUrl`: existing Floot account-registration page.
-- `registrationFormUrl`: optional URL for an external application form. It is blank by default; no form provider is enabled.
-- `contact.email`, `contact.phone`, and `contact.whatsapp`: optional contact methods. Their links appear only when configured.
-- `contact.address`: optional future street address; no street address is currently published.
+- Home-page WhatsApp and email contact bar.
+- Quick registration without an account.
+- WhatsApp registration messages prepared from the visitor's details.
+- Selected course carried from the training page into registration.
+- Service-specific WhatsApp enquiries and email subjects.
+- Existing Floot sign-in and account-registration links.
+- Proposed course outlines with unconfirmed fees and schedules.
+- Corrected staff profile and training-page HTML.
 
-The included values are carried over from the existing public-site configuration. Email links open the visitor's email application and do not send a message automatically. The contact page has no browser-only submission form.
+## Registration behaviour
 
-Training application links go to the existing Floot portal. This static website does not create Floot accounts, centrally store applications, send automatic emails, or provide secure administration. Do not add secrets or private credentials to this client-side configuration.
+Quick registration prepares a WhatsApp message.
 
-## Publish on GitHub Pages
+The visitor must open WhatsApp, review the message, and press Send.
+The website does not store the application or confirm a student place.
 
-The repository includes `.github/workflows/deploy-github-pages.yml`, which uploads **only this `github-pages` folder** as the Pages site artifact.
+## Contact details
 
-1. Push the project to GitHub.
-2. In the repository, open **Settings â†’ Pages** and choose **GitHub Actions** as the build and deployment source.
-3. Ensure Actions are allowed for the repository and push to the default branch (or run the workflow manually from the Actions tab). The workflow also runs for changes under `github-pages/**`.
-4. Wait for the **Deploy static GET-PC site to GitHub Pages** workflow to finish, then open the Pages URL shown in the deployment job.
-5. For a custom domain later, configure the domain in **Settings â†’ Pages** and apply the DNS records GitHub provides. The site uses relative links and assets and requires no path change.
+Edit assets/js/config.js to update contact details and portal URLs.
 
-The generated static site is compatible with both `https://USERNAME.github.io/REPOSITORY/` and a custom-domain root. Do not publish the source app, `.env` files, or the rest of the repository as the Pages artifact.
+The existing call number is 833696147. Verify this before publishing.
+The WhatsApp number is +220 3696147.
+The email is getpc24@gmail.com.
 
-## Not included in this static version
+The home-page contact bar also contains the WhatsApp number and email
+directly in index.html. Update those links when contact details change.
 
-- Local contact/application form submissions and centralized student records: require an approved backend or external form service.
-- Automatic registration or contact emails: require a backend or external email service.
-- Secure staff/admin accounts and dashboards: require server-side authentication and authorization.
-- AI chat: this site only includes a small predefined FAQ/help widget with a contact fallback.
+## Course information
 
-No fees, dates, schedules, duration, capacity, spaces, extra staff, qualifications, or testimonials have been added.
+Confirm the actual fees, duration, dates, timetable, requirements,
+and syllabuses before publishing them as final.
+
+Edit training.html to update course information.
+Update the FAQ answers in assets/js/main.js when details change.
+
+## Central storage and automatic emails
+
+No central registration storage or email service is connected.
+
+To show an external application form, set registrationFormUrl in
+assets/js/config.js to the actual HTTPS form URL.
+
+Configure storage, exports, and automatic acknowledgements through
+that form provider. Verify a test submission before promoting it.
+
+Never place private API keys or passwords in this public repository.
+
+## File locations
+
+- index.html: Home page.
+- register.html: Registration options and WhatsApp form.
+- training.html: Course information.
+- staff.html: Staff profile.
+- assets/css/styles.css: Website design.
+- assets/js/config.js: Contact details and portal/form URLs.
+- assets/js/main.js: Navigation, contact links, registration, and FAQs.
