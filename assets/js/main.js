@@ -65,40 +65,31 @@
     }
   }
 
-  var contactLinks = document.getElementById("contact-links");
-  if (contactLinks) {
-    var addressElement = document.getElementById("contact-address");
-    var contactNote = document.getElementById("contact-note");
-    var address = typeof contact.address === "string" ? contact.address.trim() : "";
-    if (address && addressElement) {
-      addressElement.textContent = address;
-      addressElement.hidden = false;
-      if (contactNote) contactNote.hidden = true;
+  var serviceForEmail = new URLSearchParams(window.location.search).get("service") || "";
+  var email = typeof contact.email === "string" ? contact.email.trim() : "";
+  var phone = typeof contact.phone === "string" ? contact.phone.trim() : "";
+  var whatsapp = typeof contact.whatsapp === "string" ? contact.whatsapp.trim() : "";
+  var contactMethods = [
+    {
+      label: email,
+      prefix: "Email",
+      href: email ? "mailto:" + email + "?subject=" + encodeURIComponent(serviceForEmail ? "GET-PC service inquiry: " + serviceForEmail : "GET-PC inquiry") : ""
+    },
+    {
+      label: phone,
+      prefix: "Call",
+      href: phone ? "tel:" + phone.replace(/[^\d+]/g, "") : ""
+    },
+    {
+      label: whatsapp,
+      prefix: "WhatsApp",
+      href: whatsapp ? "https://wa.me/" + whatsapp.replace(/\D/g, "") : ""
     }
+  ];
 
-    var serviceForEmail = new URLSearchParams(window.location.search).get("service") || "";
-    var email = typeof contact.email === "string" ? contact.email.trim() : "";
-    var phone = typeof contact.phone === "string" ? contact.phone.trim() : "";
-    var whatsapp = typeof contact.whatsapp === "string" ? contact.whatsapp.trim() : "";
-    var methods = [
-      {
-        label: email,
-        prefix: "Email",
-        href: email ? "mailto:" + email + "?subject=" + encodeURIComponent(serviceForEmail ? "GET-PC service inquiry: " + serviceForEmail : "GET-PC inquiry") : ""
-      },
-      {
-        label: phone,
-        prefix: "Call",
-        href: phone ? "tel:" + phone.replace(/[^\d+]/g, "") : ""
-      },
-      {
-        label: whatsapp,
-        prefix: "WhatsApp",
-        href: whatsapp ? "https://wa.me/" + whatsapp.replace(/\D/g, "") : ""
-      }
-    ];
-
-    methods.forEach(function (method) {
+  function renderContactMethods(container) {
+    var count = 0;
+    contactMethods.forEach(function (method) {
       if (!method.label || !method.href) return;
       var link = document.createElement("a");
       var icon = document.createElement("span");
@@ -112,8 +103,28 @@
         link.target = "_blank";
         link.rel = "noopener noreferrer";
       }
-      contactLinks.appendChild(link);
+      container.appendChild(link);
+      count += 1;
     });
+    return count;
+  }
+
+  var contactLinks = document.getElementById("contact-links");
+  if (contactLinks) {
+    var addressElement = document.getElementById("contact-address");
+    var contactNote = document.getElementById("contact-note");
+    var address = typeof contact.address === "string" ? contact.address.trim() : "";
+    if (address && addressElement) {
+      addressElement.textContent = address;
+      addressElement.hidden = false;
+      if (contactNote) contactNote.hidden = true;
+    }
+    renderContactMethods(contactLinks);
+  }
+
+  var homeContactBar = document.getElementById("home-contact-bar");
+  if (homeContactBar && renderContactMethods(homeContactBar.querySelector(".contact-bar-links")) > 0) {
+    homeContactBar.hidden = false;
   }
 
   var helpPanel = document.createElement("section");
