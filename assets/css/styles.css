@@ -38,6 +38,13 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .nav-sign-in span { margin-left: 4px; color: var(--teal); }
 .menu-toggle { display: none; border: 1px solid var(--line); border-radius: 5px; padding: 8px 12px; color: var(--navy); background: var(--white); font-size: 12px; font-weight: 700; cursor: pointer; }
 
+.contact-bar { border-bottom: 1px solid var(--line); background: #e6f5f1; }
+.contact-bar-inner { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 22px; width: min(100% - 48px, 1164px); margin: 0 auto; padding: 10px 0; }
+.contact-bar-title { margin: 0; color: var(--navy); font-size: 12px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+.contact-bar-links { display: flex; flex-wrap: wrap; gap: 8px 20px; }
+.contact-bar-links a { display: inline-flex; align-items: center; gap: 8px; color: var(--teal-dark); font-size: 13px; font-weight: 750; }
+.contact-bar-links a:hover { color: var(--navy); }
+.contact-bar-links .contact-link-icon { display: grid; width: 22px; height: 22px; place-items: center; border-radius: 50%; color: var(--white); background: var(--teal-dark); font-size: 10px; }
 .hero { position: relative; overflow: hidden; color: var(--white); background: var(--navy-deep); }
 .hero-inner { position: relative; z-index: 1; display: grid; grid-template-columns: 1.06fr .94fr; align-items: center; gap: 48px; width: min(100% - 48px, 1164px); min-height: 570px; padding: 62px 0; margin: auto; }
 .hero-grid { position: absolute; inset: 0 0 0 48%; opacity: .13; background-image: linear-gradient(rgba(125,206,194,.24) 1px, transparent 1px), linear-gradient(90deg, rgba(125,206,194,.24) 1px, transparent 1px); background-size: 46px 46px; mask-image: linear-gradient(90deg, transparent, black 24%, black); }
