@@ -1,14 +1,8 @@
 (function () {
   'use strict';
-  // Replace this sample data with validated Google Sheets data in the next phase.
-  const products = [
-    { id: 'sample-laptop', name: 'Everyday laptop', category: 'Laptops', price: 8500, available: true, description: 'An example laptop for documents, online learning, and everyday work.', details: 'Illustrative specification: Core i5 processor, 8 GB RAM, and 256 GB SSD. Actual brand, condition, specifications, and warranty must be confirmed with GET-PC.', icon: 'laptop' },
-    { id: 'sample-desktop', name: 'Office desktop', category: 'Desktops', price: 6500, available: true, description: 'An example desktop setup for a home office or study space.', details: 'Illustrative specification: 8 GB RAM and 256 GB SSD. Monitor and accessories are not implied to be included. Ask GET-PC about current options.', icon: 'desktop' },
-    { id: 'sample-mouse', name: 'Wireless mouse', category: 'Accessories', price: 350, available: true, description: 'An example wireless accessory for a simpler workspace.', details: 'Example wireless mouse with a USB receiver. Compatibility, batteries, colour, and actual availability must be confirmed.', icon: 'mouse' },
-    { id: 'sample-keyboard', name: 'USB keyboard', category: 'Accessories', price: 500, available: true, description: 'An example full-size keyboard for everyday typing.', details: 'Example wired keyboard for a desktop or laptop. Ask GET-PC about layout and compatible devices.', icon: 'keyboard' },
-    { id: 'sample-monitor', name: 'Desktop monitor', category: 'Monitors', price: 3500, available: false, description: 'An example display for work, study, and a larger view.', details: 'This item demonstrates the sold-out state. Size, resolution, ports, and condition will be listed for real products.', icon: 'desktop' },
-    { id: 'sample-printer', name: 'Home office printer', category: 'Printers', price: 9500, available: true, description: 'An example printer for documents and everyday office tasks.', details: 'Ask GET-PC about current printer models, ink costs, connection options, and warranty before purchasing.', icon: 'printer' }
-  ];
+  let products = [];
+  let loading = false;
+  let loadError = '';
   const icons = {
     laptop: '<rect x="22" y="15" width="116" height="75" rx="5"/><path d="M12 98h136l-12 10H24z"/><path d="M35 31h90v43H35z"/>',
     desktop: '<rect x="15" y="12" width="130" height="80" rx="5"/><path d="M80 92v18m-30 0h60M28 28h104v48H28z"/>',
@@ -31,17 +25,30 @@
   }
   function artwork(product) {
     const box = element('div', 'product-art');
-    box.setAttribute('aria-hidden', 'true');
+
     // Only fixed, local SVG paths are inserted; product text uses textContent.
-    box.innerHTML = '<svg viewBox="0 0 160 120" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">' + icons[product.icon] + '</svg>';
-    box.append(element('span', 'sample-tag', 'SAMPLE • ILLUSTRATION'));
+    box.innerHTML = '<svg viewBox="0 0 160 120" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">' + (icons[product.icon] || icons.laptop) + '</svg>';
+    box.querySelector('svg').setAttribute('aria-hidden', 'true');
+    if (product.imageUrl) {
+      const photo = document.createElement('img');
+      photo.alt = product.name;
+      photo.loading = 'lazy';
+      photo.decoding = 'async';
+      photo.referrerPolicy = 'no-referrer';
+      photo.addEventListener('load', () => { box.querySelector('svg').style.display = 'none'; });
+      photo.addEventListener('error', () => { photo.remove(); box.querySelector('svg').style.display = '';  });
+      photo.src = product.imageUrl;
+      box.append(photo);
+    } else {
+      box.append(element('span', 'sample-tag', 'PHOTO COMING SOON'));
+    }
     return box;
   }
   function inquiry(product) {
     const phone = String((window.GETPC_CONFIG?.contact?.whatsapp) || '').replace(/\D/g, '');
     const link = element('a', 'button button-dark', product.available ? 'Ask to Buy on WhatsApp ↗' : 'Ask about alternatives ↗');
     if (phone.length >= 7 && phone.length <= 15) {
-      const message = 'Hello GET-PC, I saw the SAMPLE ' + product.name + ' (illustrative price ' + money(product.price) + ') on your website. ' + (product.available ? 'Do you have a similar product for sale? Please confirm the actual price and availability.' : 'Do you have similar products available?');
+      const message = 'Hello GET-PC, I am interested in ' + product.name + ' (' + money(product.price) + ', product ID: ' + product.id + '). ' + (product.available ? 'Is it available? Please confirm the price and how I can buy it.' : 'It is listed as sold out. Do you have a similar product available?');
       link.href = 'https://wa.me/' + phone + '?text=' + encodeURIComponent(message);
       link.target = '_blank';
       link.rel = 'noopener noreferrer';
@@ -57,7 +64,7 @@
     content.replaceChildren(artwork(product));
     const title = element('h2', '', product.name);
     title.id = 'product-dialog-title';
-    content.append(title, element('p', 'product-price', money(product.price)), element('p', '', product.details), element('p', 'sample-detail', 'Sample product and illustrative price only. Contact GET-PC to confirm actual products, prices, payment, and collection.'), inquiry(product));
+    content.append(title, element('p', 'product-price', money(product.price)), element('p', '', product.details), element('p', 'purchase-note', 'Contact GET-PC to confirm availability, payment, and collection before buying.'), inquiry(product));
     dialog.showModal();
   }
   function render() {
@@ -66,12 +73,12 @@
     grid.replaceChildren();
     visible.forEach(product => {
       const card = element('article', 'product-card');
-      card.id = product.id;
+      card.dataset.productId = product.id;
       const body = element('div', 'product-body');
       const meta = element('div', 'product-meta');
-      meta.append(element('span', '', product.category), element('span', 'stock' + (product.available ? '' : ' sold'), product.available ? 'Sample: available' : 'Sample: sold out'));
+      meta.append(element('span', '', product.category), element('span', 'stock' + (product.available ? '' : ' sold'), product.available ? 'Available' : 'Sold out'));
       const price = element('p', 'product-price', money(product.price));
-      price.append(element('small', '', 'Illustrative price'));
+
       const actions = element('div', 'product-actions');
       const detail = element('button', 'details-button', 'View details');
       detail.type = 'button';
@@ -82,19 +89,61 @@
       card.append(artwork(product), body);
       grid.append(card);
     });
-    document.getElementById('product-count').textContent = visible.length + ' sample product' + (visible.length === 1 ? '' : 's');
-    document.getElementById('product-empty').hidden = visible.length !== 0;
+    document.getElementById('product-count').textContent = visible.length + ' product' + (visible.length === 1 ? '' : 's');
+    document.getElementById('product-empty').hidden = loading || !!loadError || visible.length !== 0;
+    if (!loading && !loadError && !products.length) document.getElementById('product-empty').querySelector('p').textContent = 'New products will appear here soon. Contact GET-PC for current availability.';
     filters.querySelectorAll('button').forEach(button => button.setAttribute('aria-pressed', String(button.textContent === category)));
   }
-  ['All', ...new Set(products.map(p => p.category))].forEach(name => {
-    const button = element('button', '', name);
-    button.type = 'button';
-    button.addEventListener('click', () => { category = name; render(); });
-    filters.append(button);
-  });
+  function buildFilters() {
+    filters.replaceChildren();
+    ['All', ...new Set(products.map(p => p.category))].forEach(name => {
+      const button = element('button', '', name);
+      button.type = 'button';
+      button.addEventListener('click', () => { category = name; render(); });
+      filters.append(button);
+    });
+  }
+  async function loadProducts() {
+    loading = true;
+    loadError = '';
+    const state = document.getElementById('catalogue-state');
+    const message = document.getElementById('catalogue-state-message');
+    const retry = document.getElementById('retry-products');
+    state.hidden = false;
+    retry.hidden = true;
+    message.textContent = 'Loading products…';
+    search.disabled = true;
+    render();
+    const endpoint = window.GETPC_CONFIG?.productsFeedUrl || '';
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 15000);
+    try {
+      if (!endpoint) throw new Error('unconfigured');
+      const url = new URL(endpoint);
+      if (url.protocol !== 'https:' || url.hostname !== 'script.google.com' || !/^\/macros\/s\/[^/]+\/exec$/.test(url.pathname)) throw new Error('unconfigured');
+      const response = await fetch(url.href, { signal: controller.signal, credentials: 'omit', redirect: 'follow' });
+      if (!response.ok) throw new Error('unavailable');
+      const data = await response.json();
+      products = window.GETPC_PRODUCTS.normalize(data);
+      category = 'All';
+      buildFilters();
+      state.hidden = true;
+    } catch (error) {
+      products = [];
+      loadError = error.message;
+      message.textContent = loadError === 'unconfigured' ? 'Our product catalogue is being prepared. Please contact GET-PC for current products and prices.' : 'We could not load products right now. Please try again or contact GET-PC.';
+      retry.hidden = loadError === 'unconfigured';
+    } finally {
+      clearTimeout(timeout);
+      loading = false;
+      search.disabled = !!loadError;
+      render();
+    }
+  }
+  document.getElementById('retry-products').addEventListener('click', loadProducts);
   search.addEventListener('input', render);
   document.getElementById('clear-filters').addEventListener('click', () => { category = 'All'; search.value = ''; render(); search.focus(); });
   dialog.querySelector('.dialog-close').addEventListener('click', () => dialog.close());
   dialog.addEventListener('close', () => previousFocus?.focus());
-  render();
+  loadProducts();
 }());
