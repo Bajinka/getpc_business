@@ -3,6 +3,7 @@ window.GETPC_CONFIG = {
   location: "Brikama, The Gambia",
   portalLoginUrl: "https://getpcskills.floot.app/login",
   portalRegistrationUrl: "https://getpcskills.floot.app/register",
+  productsFeedUrl: "https://script.google.com/macros/s/AKfycbw85RuahZ81csx6k7ky3E19ucMKWzQ-o2fhTGON_N59eAyaut2xB5mo_akq82K14HU/exec", // Paste the deployed Apps Script /exec URL here.
   registrationFormUrl: "",
   contact: {
     email: "getpc24@gmail.com",
@@ -11,3 +12,4 @@ window.GETPC_CONFIG = {
     address: ""
   }
 };
+
