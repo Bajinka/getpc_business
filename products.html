@@ -13,6 +13,7 @@
   <script src="assets/js/config.js" defer></script>
   <script src="assets/js/main.js" defer></script>
   <link rel="stylesheet" href="assets/css/products.css">
+  <script src="assets/js/products-data.js" defer></script>
   <script src="assets/js/products.js" defer></script>
 </head>
 
@@ -40,8 +41,7 @@
       </p>
     </section>
     <section class="section catalogue" aria-label="Product catalogue">
-      <div class="sample-notice"><strong>Sample catalogue</strong><span>These example products and prices show how the
-          shop will look. They are not confirmed offers or stock.</span></div>
+      <div id="catalogue-state" class="catalogue-state" role="status"><p id="catalogue-state-message">Loading products…</p><button id="retry-products" type="button" class="button button-dark" hidden>Try again</button> <a href="contact.html" class="text-link">Contact GET-PC →</a></div>
       <div class="catalogue-toolbar">
         <div>
           <p class="eyebrow">Browse the collection</p>
