@@ -43,8 +43,8 @@ async function ui(endpoint,fetcher){
   const ids={};
   for(const id of ['product-grid','product-search','category-filters','product-dialog','product-dialog-content','product-count','product-empty','clear-filters','catalogue-state','catalogue-state-message','retry-products'])ids[id]=new Element();
   const close=new Element('button');close.className='dialog-close';ids['product-dialog'].append(close);ids['product-empty'].append(new Element('p'));
-  const window={GETPC_CONFIG:{productsFeedUrl:endpoint,contact:{whatsapp:'+220 3696147'}},GETPC_PRODUCTS:{normalize}};
-  const context=vm.createContext({window,document:{getElementById:id=>ids[id],createElement:tag=>new Element(tag)},URL,AbortController,setTimeout,clearTimeout,fetch:fetcher});
+  const window={location:{href:'https://getpc.gm/products.html',search:''},GETPC_CONFIG:{productsFeedUrl:endpoint,contact:{whatsapp:'+220 3696147'}},GETPC_PRODUCTS:{normalize}};
+  const context=vm.createContext({window,document:{getElementById:id=>ids[id],createElement:tag=>new Element(tag)},URL,URLSearchParams,AbortController,setTimeout,clearTimeout,fetch:fetcher});
   vm.runInContext(source('assets/js/products.js'),context);
   await new Promise(resolve=>setImmediate(resolve));
   return ids;
@@ -67,7 +67,7 @@ async function ui(endpoint,fetcher){
   const viewer=ids['product-dialog-content'].children[0];
   const art=viewer.children[0];
   art.style.setProperty=function(key,value){this[key]=value;};
-  const controls=viewer.children[1].children;
+  const controls=viewer.children[2].children;
   for(let i=0;i<4;i++)controls[2].handlers.click();
   assert.equal(art.style['--rotate-y'],'50deg');
   controls[1].handlers.click();assert.equal(art.style['--rotate-y'],'0deg');
@@ -90,3 +90,12 @@ async function ui(endpoint,fetcher){
   const malformed=await ui(endpoint,async()=>({ok:true,json:async()=>{throw new Error('Invalid JSON');}}));assert.equal(malformed['retry-products'].hidden,false);
   console.log('PASS: publication filtering, schema checks, hidden data, numeric prices, photos/fallback, WhatsApp, search, categories, modal, empty, setup, failure, and retry.');
 })().catch(error=>{console.error(error);process.exitCode=1;});
+// Optional sheet columns and safe galleries remain backward compatible.
+const extraHeaders=[...headers,'Additional images','Condition','Featured'];
+const extraRow=[...row,'https://example.com/back.jpg, javascript:alert(1)','Used','Yes'];
+const extra=JSON.parse(JSON.stringify(server.productRows_([extraHeaders,extraRow])));
+assert.equal(extra[0].imageUrls.length,1);assert.equal(extra[0].featured,true);
+const gallery=normalize({ok:true,products:extra})[0];
+assert.equal(gallery.imageUrls.length,2);assert.equal(gallery.condition,'Used');
+assert.equal(normalize({ok:true,products:[{...extra[0],imageUrl:'',imageUrls:['https://example.com/back.jpg']} ]})[0].imageUrl,'https://example.com/back.jpg');
+console.log('PASS: optional gallery, condition, featured and missing cover fallback');

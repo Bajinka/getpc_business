@@ -45,3 +45,7 @@ The generated static site is compatible with both `https://USERNAME.github.io/RE
 - AI chat: this site only includes a small predefined FAQ/help widget with a contact fallback.
 
 No fees, dates, schedules, duration, capacity, spaces, extra staff, qualifications, or testimonials have been added.
+
+
+## Whole-site upgrade
+See [Website upgrade and activation](docs/WEBSITE-UPGRADE.md) for private inquiry storage, gallery columns, analytics configuration and remaining business content. Existing product deployment continues to work without the optional columns.
