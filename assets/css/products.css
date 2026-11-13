@@ -38,3 +38,24 @@
 .catalogue-state { padding:22px; margin-bottom:28px; border:1px solid var(--line); border-radius:8px; background:white; }
 .catalogue-state[hidden] { display:none; }
 .purchase-note { color:var(--muted); font-size:13px; }
+
+/* Rotate the photo plane while keeping product text and purchase links steady. */
+.product-art { perspective:800px; overflow:hidden; }
+.product-art > img, .product-art > svg {
+  transform:rotateX(var(--rotate-x,0deg)) rotateY(var(--rotate-y,0deg)) scale(.94);
+  transition:transform 220ms ease-out;
+  filter:drop-shadow(0 10px 9px rgba(16,43,59,.14));
+}
+.product-card { transition:box-shadow 220ms ease, border-color 220ms ease; }
+.product-card:hover, .product-card:focus-within {
+  border-color:var(--teal-dark);
+  box-shadow:0 14px 30px rgba(16,43,59,.12);
+}
+.photo-controls { display:flex; flex-wrap:wrap; justify-content:center; gap:8px; margin-top:14px; }
+.photo-controls button { min-height:44px; padding:9px 12px; border:1px solid var(--line); border-radius:6px; background:white; color:var(--navy); cursor:pointer; font:inherit; font-size:13px; }
+.photo-controls button:hover { background:#e2eeeb; }
+.photo-controls button:focus-visible { outline:3px solid var(--teal-dark); outline-offset:3px; }
+.photo-hint { text-align:center; font-size:12px; color:var(--muted); margin:10px 0 18px; }
+@media (prefers-reduced-motion:reduce) {
+  .product-art > img, .product-art > svg, .product-card { transition:none; }
+}

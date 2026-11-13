@@ -23,8 +23,22 @@
     if (text) node.textContent = text;
     return node;
   }
-  function artwork(product) {
+  function artwork(product, interactive = false) {
     const box = element('div', 'product-art');
+    const reducedMotion = () => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    let angle = 0;
+    function turn(x, y) {
+      box.style.setProperty('--rotate-x', x + 'deg');
+      box.style.setProperty('--rotate-y', y + 'deg');
+    }
+    box.addEventListener('pointermove', event => {
+      if (event.pointerType !== 'mouse' || reducedMotion()) return;
+      const bounds = box.getBoundingClientRect();
+      if (!bounds.width || !bounds.height) return;
+      turn((0.5 - (event.clientY - bounds.top) / bounds.height) * 16,
+        ((event.clientX - bounds.left) / bounds.width - 0.5) * 24);
+    });
+    box.addEventListener('pointerleave', () => turn(0, angle));
 
     // Only fixed, local SVG paths are inserted; product text uses textContent.
     box.innerHTML = '<svg viewBox="0 0 160 120" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">' + (icons[product.icon] || icons.laptop) + '</svg>';
@@ -41,6 +55,26 @@
       box.append(photo);
     } else {
       box.append(element('span', 'sample-tag', 'PHOTO COMING SOON'));
+    }
+    if (interactive) {
+      const controls = element('div', 'photo-controls');
+      controls.setAttribute('role', 'group');
+      controls.setAttribute('aria-label', 'Rotate product photo');
+      const rotate = (label, change) => {
+        const button = element('button', '', label);
+        button.type = 'button';
+        button.addEventListener('click', () => {
+          angle = change === 0 ? 0 : Math.max(-50, Math.min(50, angle + change));
+          turn(0, angle);
+        });
+        controls.append(button);
+      };
+      rotate('Rotate left', -25);
+      rotate('Reset', 0);
+      rotate('Rotate right', 25);
+      const viewer = element('div', 'photo-viewer');
+      viewer.append(box, controls, element('p', 'photo-hint', 'Tilt the photo with your mouse or the rotation buttons. Photo effect only.'));
+      return viewer;
     }
     return box;
   }
@@ -61,7 +95,7 @@
   function openDetails(product, trigger) {
     previousFocus = trigger;
     const content = document.getElementById('product-dialog-content');
-    content.replaceChildren(artwork(product));
+    content.replaceChildren(artwork(product, true));
     const title = element('h2', '', product.name);
     title.id = 'product-dialog-title';
     content.append(title, element('p', 'product-price', money(product.price)), element('p', '', product.details), element('p', 'purchase-note', 'Contact GET-PC to confirm availability, payment, and collection before buying.'), inquiry(product));
