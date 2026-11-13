@@ -8,7 +8,7 @@ function doGet() {
     if (!sheet) throw new Error('Products tab missing');
     const lastRow = sheet.getLastRow();
     if (lastRow < 1) throw new Error('Product headers missing');
-    const values = sheet.getRange(1, 1, lastRow, PRODUCT_HEADERS.length).getValues();
+    const values = sheet.getRange(1, 1, lastRow, Math.max(PRODUCT_HEADERS.length, sheet.getLastColumn())).getValues();
     return productJson_({ok: true, products: productRows_(values)});
   } catch (error) {
     console.error(error.message);
@@ -33,8 +33,15 @@ function productRows_(values) {
     }
     seen.add(id);
     const image = String(row[5] || '').trim();
+    const optional = header => {
+      const column = values[0].findIndex(cell => String(cell).trim() === header);
+      return column < 0 ? '' : String(row[column] || '').trim();
+    };
+    const imageUrls = optional('Additional images').split(/[\n,]+/).map(url=>url.trim()).filter(url=>/^https:\/\//i.test(url)).slice(0,7);
+    const condition = optional('Condition');
+    const featured = optional('Featured').toLowerCase() === 'yes';
     // Explicit whitelist: no internal columns or other tabs are returned.
-    output.push({id, name, price, description: String(row[3] || ''), category: String(row[4] || 'Other').trim(), imageUrl: /^https:\/\//i.test(image) ? image : '', availability, details: String(row[8] || '')});
+    output.push({id, name, price, imageUrls, condition, featured, description: String(row[3] || ''), category: String(row[4] || 'Other').trim(), imageUrl: /^https:\/\//i.test(image) ? image : '', availability, details: String(row[8] || '')});
   });
   return output;
 }

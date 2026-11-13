@@ -12,7 +12,13 @@
   <link rel="stylesheet" href="assets/css/styles.css">
   <script src="assets/js/config.js" defer></script>
   <script src="assets/js/main.js" defer></script>
-</head>
+<link rel="canonical" href="https://getpc.gm/register.html">
+<meta property="og:title" content="Training Registration | GET-PC Technical Solution">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://getpc.gm/register.html">
+<link rel="stylesheet" href="assets/css/upgrade.css">
+<script src="assets/js/site-enhancements.js" defer></script>
+<script src="assets/js/leads.js" defer></script></head>
 
 <body>
   <a class="skip-link" href="#main-content">Skip to content</a>
@@ -35,33 +41,14 @@
       <h1>Choose your next<br><em>learning step.</em></h1>
       <p>Training levels are independent. You can choose one level without taking the others.</p>
     </section>
-    <section class="section register-content">
-      <div class="register-panel">
-        <p class="eyebrow">Available registration method</p>
-        <h2>Use the existing GET-PC training portal.</h2>
-        <p>Account creation and course registration are handled through the GET-PC  portal. This static website does not
-          create portal accounts, accept applications, or store registration details.</p><a class="button button-dark"
-          data-portal-register href="https://getpcskills.floot.app/register" target="_blank"
-          rel="noopener noreferrer">Continue to  registration <span aria-hidden="true">↗</span></a>
-        <p class="small-note">The portal opens separately. Please confirm registration details and requirements there.
-        </p>
-      </div>
-      <div id="external-registration" class="register-panel" hidden>
-        <p class="eyebrow">External registration form</p>
-        <h2>Quick registration</h2>
-        <p>A separate registration form has been configured.</p><a class="button button-teal"
-          data-registration-form-link href="#" target="_blank" rel="noopener noreferrer">Open registration form <span
-            aria-hidden="true">↗</span></a>
-      </div>
-      <div class="register-note">
-        <h2>Training is simple and supported</h2>
-        <p>GET-PC makes course registration clear, practical, and stress-free. The official training portal gives you a
-          direct route to create an account, choose your course, and continue with the next steps in a secure and guided
-          process.</p>
-        <p>Questions about training? <a class="text-link" href="contact.html">Contact GET-PC <span
-              aria-hidden="true">→</span></a></p>
-      </div>
-    </section>
+    <section class="section register-content"><div class="register-panel"><p class="eyebrow">No account needed</p><h2>Quick training inquiry</h2><p>Tell us your preferred course. We’ll discuss the fee, schedule and available places with you.</p><form class="lead-form" data-kind="training">
+<div class="form-row"><label>Full name<input name="name" autocomplete="name" required maxlength="100"></label><label>Phone / WhatsApp<input name="phone" type="tel" autocomplete="tel" required maxlength="30"></label></div>
+<label>Email (optional)<input name="email" type="email" autocomplete="email" maxlength="150"></label><label>Course<select name="topic" required><option value="">Choose a course</option><option value="level-1">Computer &amp; Office Essentials</option><option value="level-2">Graphic Design</option><option value="level-3">Web Development</option></select></label>
+<label>Questions or preferred schedule<textarea name="message" rows="4" maxlength="2000" ></textarea></label>
+<div class="form-trap" aria-hidden="true"><label>Leave this empty<input name="website" tabindex="-1" autocomplete="off"></label></div>
+<label class="consent"><input name="consent" type="checkbox" value="yes" required> I agree that GET-PC may use these details to respond to my inquiry. <a href="privacy.html">Privacy information</a></label>
+<p class="form-availability" role="status"></p><div class="button-row"><button type="submit" class="button button-dark" data-send>Send inquiry</button><button type="button" class="button button-teal" data-whatsapp>Continue on WhatsApp ↗</button></div><p class="form-result" role="status" aria-live="polite"></p>
+<p class="small-note">WhatsApp opens a prepared message. You must press Send there. A training place or service booking is confirmed separately by our team.</p><noscript>Please enable JavaScript or use the contact links to send your inquiry.</noscript></form></div><div class="register-panel"><p class="eyebrow">Student portal</p><h2>Create an account &amp; register</h2><p>Prefer an account? Continue to the GET-PC training portal to register and manage your learning.</p><a class="button button-dark" data-portal-register href="https://getpcskills.floot.app/register" target="_blank" rel="noopener noreferrer">Create account &amp; register ↗</a><p class="small-note">Already registered? <a data-portal-login href="https://getpcskills.floot.app/login">Sign in to your account</a>.</p></div></section>
   </main>
   <footer class="site-footer">
     <div class="footer-main">
@@ -75,7 +62,7 @@
           href="training.html">Training</a><a href="staff.html">Staff</a><a href="about.html">About</a><a
           href="contact.html">Contact</a></nav>
     </div>
-    <div class="footer-bottom"><span>© 2026 GET-PC Technical Solution</span><span>Brikama, The Gambia</span></div>
+    <div class="footer-bottom"><span>© 2026 GET-PC Technical Solution · <a href="privacy.html">Privacy</a></span><span>Brikama, The Gambia</span></div>
   </footer>
 </body>
 

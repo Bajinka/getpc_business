@@ -12,6 +12,7 @@
   };
   const grid = document.getElementById('product-grid');
   const search = document.getElementById('product-search');
+  const sort = document.getElementById('product-sort');
   const filters = document.getElementById('category-filters');
   const dialog = document.getElementById('product-dialog');
   let category = 'All';
@@ -73,7 +74,37 @@
       rotate('Reset', 0);
       rotate('Rotate right', 25);
       const viewer = element('div', 'photo-viewer');
-      viewer.append(box, controls, element('p', 'photo-hint', 'Tilt the photo with your mouse or the rotation buttons. Photo effect only.'));
+      const zoom = element('button', '', 'Zoom photo');
+      zoom.type = 'button';
+      zoom.setAttribute('aria-pressed', 'false');
+      zoom.disabled = !product.imageUrl;
+      zoom.addEventListener('click', () => {
+        const active = viewer.classList.toggle('is-zoomed');
+        zoom.setAttribute('aria-pressed', String(active));
+        zoom.textContent = active ? 'Reset zoom' : 'Zoom photo';
+      });
+      controls.append(zoom);
+      const thumbs = element('div', 'gallery-thumbnails');
+      const photos = product.imageUrls || [product.imageUrl];
+      if (photos.length > 1) photos.forEach((url,index) => {
+        const button = element('button');button.type='button';
+        button.setAttribute('aria-label', 'Show photo ' + (index + 1));
+        button.setAttribute('aria-pressed', String(index === 0));
+        const thumb = document.createElement('img');thumb.src=url;thumb.alt='';thumb.loading='lazy';button.append(thumb);
+        button.addEventListener('click', () => {
+          let photo = box.querySelector('img');
+          if (!photo) {
+            photo = document.createElement('img');photo.alt=product.name;
+            photo.addEventListener('load',()=>{box.querySelector('svg').style.display='none';zoom.disabled=false;});
+            photo.addEventListener('error',()=>{photo.remove();box.querySelector('svg').style.display='';zoom.disabled=true;});
+            box.append(photo);
+          }
+          photo.src=url;
+          thumbs.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(b===button)));
+        });
+        thumbs.append(button);
+      });
+      viewer.append(box, thumbs, controls, element('p', 'photo-hint', 'Tilt the photo with your mouse or the rotation buttons. Photo effect only.'));
       return viewer;
     }
     return box;
@@ -98,12 +129,27 @@
     content.replaceChildren(artwork(product, true));
     const title = element('h2', '', product.name);
     title.id = 'product-dialog-title';
-    content.append(title, element('p', 'product-price', money(product.price)), element('p', '', product.details), element('p', 'purchase-note', 'Contact GET-PC to confirm availability, payment, and collection before buying.'), inquiry(product));
+    content.append(title, element('p', 'product-price', money(product.price)), element('p', 'product-specs', product.details), element('p', 'purchase-note', 'Contact GET-PC to confirm availability, payment, and collection before buying.'), inquiry(product));
+    if (product.condition) content.append(element('p', '', 'Condition: ' + product.condition));
+    content.append(element('p', 'purchase-note', 'Ask us to confirm any warranty, delivery options and charges before you pay.'));
+    const sharing = element('div', 'product-share');
+    const share = element('button', 'details-button', 'Copy product link');share.type='button';
+    const productUrl = new URL('products.html', window.location.href);productUrl.searchParams.set('product', product.id);
+    const shareStatus = element('p');shareStatus.setAttribute('role','status');
+    share.addEventListener('click', async () => {
+      try {await Promise.race([navigator.clipboard.writeText(productUrl.href), new Promise((_,reject)=>setTimeout(()=>reject(new Error('Clipboard unavailable')),2000))]);shareStatus.textContent='Product link copied.';}
+      catch (_) {const input=element('input');input.value=productUrl.href;input.readOnly=true;input.setAttribute('aria-label','Product link to copy');sharing.append(input);input.focus();input.select();shareStatus.textContent='Copy the selected link.';}
+    });
+    const permalink = element('a', 'text-link', 'Open product link');permalink.href=productUrl.href;
+    sharing.append(share,permalink,shareStatus);content.append(sharing);
     dialog.showModal();
   }
   function render() {
     const term = search.value.trim().toLowerCase();
     const visible = products.filter(p => (category === 'All' || p.category === category) && (p.name + ' ' + p.category + ' ' + p.description).toLowerCase().includes(term));
+    if (sort?.value === 'price-low') visible.sort((a,b)=>a.price-b.price);
+    if (sort?.value === 'price-high') visible.sort((a,b)=>b.price-a.price);
+    if (sort?.value === 'name') visible.sort((a,b)=>a.name.localeCompare(b.name));
     grid.replaceChildren();
     visible.forEach(product => {
       const card = element('article', 'product-card');
@@ -119,6 +165,7 @@
       detail.setAttribute('aria-label', 'View details for ' + product.name);
       detail.addEventListener('click', () => openDetails(product, detail));
       actions.append(detail, inquiry(product));
+      if (product.condition) body.append(element('p', 'small-note', product.condition));
       body.append(meta, element('h3', '', product.name), element('p', 'product-description', product.description), price, actions);
       card.append(artwork(product), body);
       grid.append(card);
@@ -172,9 +219,16 @@
       loading = false;
       search.disabled = !!loadError;
       render();
+      if (!loadError) {
+        const id = new URLSearchParams(window.location.search).get('product');
+        const selected = products.find(p=>p.id===id);
+        if (selected) openDetails(selected, search);
+        else if (id) {state.hidden=false;message.textContent='This product is no longer listed. Browse our current products below.';}
+      }
     }
   }
   document.getElementById('retry-products').addEventListener('click', loadProducts);
+  sort?.addEventListener('change', render);
   search.addEventListener('input', render);
   document.getElementById('clear-filters').addEventListener('click', () => { category = 'All'; search.value = ''; render(); search.focus(); });
   dialog.querySelector('.dialog-close').addEventListener('click', () => dialog.close());

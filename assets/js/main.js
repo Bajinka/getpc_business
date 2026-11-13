@@ -83,7 +83,7 @@
     {
       label: whatsapp,
       prefix: "WhatsApp",
-      href: whatsapp ? "https://wa.me/" + whatsapp.replace(/\D/g, "") : ""
+      href: whatsapp ? "https://wa.me/" + whatsapp.replace(/\D/g, "") + "?text=" + encodeURIComponent(serviceForEmail ? "Hello GET-PC, I need help with " + serviceForEmail + "." : "Hello GET-PC, I would like to make an inquiry.") : ""
     }
   ];
 
@@ -170,8 +170,8 @@
     if (!button) return;
     var answers = {
       services: "GET-PC provides computer repair and maintenance, graphic design, website and database development, computer training, data entry, CV and document preparation, printing, and school IT support.",
-      training: "There are three independent levels: Computer Fundamentals, Word, Excel, and PowerPoint; Graphic Design; and Web Development. You may choose one level on its own. Fees, dates, schedules, duration, and places are not confirmed.",
-      register: "Account creation and course registration are handled through the existing Floot portal. This static website does not create accounts or accept applications.",
+      training: "There are three independent levels: Computer Fundamentals, Word, Excel, and PowerPoint; Graphic Design; and Web Development. You may choose one level on its own. Contact us for current fees, dates, schedules, and availability.",
+      register: "Open Registration to send a quick course inquiry without an account, or create an account through the training portal. A place is confirmed only after our team contacts you.",
       location: "GET-PC Technical Solution is based in Brikama, The Gambia. Use the Google Maps link on the Contact page for directions."
     };
     helpPanel.querySelector(".quick-help-answer").textContent = answers[button.dataset.answer];

@@ -1,0 +1,23 @@
+const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
+const context=vm.createContext({});vm.runInContext(fs.readFileSync('apps-script/leads.gs','utf8'),context);
+const valid={requestId:'12345678-1234-1234-1234-123456789012',kind:'service',name:'Test',phone:'+220 1234567',email:'',topic:'Repair',message:'Screen fault',consent:'yes',website:''};
+assert.equal(context.validateLead_(valid).topic,'Repair');
+for(const patch of [{consent:''},{website:'spam'},{name:''},{phone:'abc'},{email:'broken'},{message:''},{kind:'unknown'},{message:'x'.repeat(2001)}])assert.throws(()=>context.validateLead_({...valid,...patch}));
+assert.equal(context.sheetText_('=IMPORTXML("x")'),'\'=IMPORTXML("x")');
+assert.equal(context.sheetText_('+2201234567'),'\'+2201234567');
+assert.equal(context.sheetText_('Plain text'),'Plain text');
+assert.equal(context.validateLead_({...valid,kind:'training',message:''}).kind,'training');
+console.log('PASS: lead validation, limits, consent, honeypot and spreadsheet formula protection');
+// Server request and retry behaviour with a private spreadsheet substitute.
+const saved=[];let released=0;
+context.PropertiesService={getScriptProperties:()=>({getProperty:()=> 'private-test-sheet'})};
+context.LockService={getScriptLock:()=>({tryLock:()=>true,hasLock:()=>true,releaseLock:()=>released++})};
+context.CacheService={getScriptCache:()=>({get:()=>null,put(){}})};
+context.SpreadsheetApp={openById:()=>({getSheetByName:()=>({getLastRow:()=>saved.length+1,getRange:()=>({createTextFinder:id=>({matchEntireCell:()=>({findNext:()=>saved.some(row=>row[0]===id)})})}),appendRow:row=>saved.push(row)})}),flush(){}};
+context.ContentService={MimeType:{JSON:'json'},createTextOutput:text=>({setMimeType:()=>JSON.parse(text)})};
+const event={parameter:valid,postData:{length:300}};
+assert.equal(context.doPost(event).ok,true);assert.equal(saved.length,1);
+assert.equal(context.doPost(event).ok,true);assert.equal(saved.length,1);assert.equal(released,2);
+assert.equal(context.doGet().ok,false);
+assert.equal(context.doPost({parameter:{...valid,consent:'no'},postData:{length:100}}).ok,false);
+console.log('PASS: receipt acknowledgement, duplicate suppression and no public lead retrieval');
