@@ -30,6 +30,7 @@ class Element {
   replaceChildren(...nodes){this.children=[];this.append(...nodes);}
   set innerHTML(value){this.html=value;this.children=[new Element('svg')];}
   setAttribute(key,value){this.attrs[key]=value;}
+  getBoundingClientRect(){return {left:0,top:0,width:200,height:200};}
   addEventListener(event,callback){this.handlers[event]=callback;}
   querySelector(selector){return this.children.find(x=>selector==='.'+x.className || selector===x.tag);}
   querySelectorAll(tag){return this.children.filter(x=>x.tag===tag);}
@@ -63,6 +64,20 @@ async function ui(endpoint,fetcher){
   assert(decodeURIComponent(actions.children[1].href).includes('laptop-001'));
   assert(decodeURIComponent(actions.children[1].href).includes('D8,500'));
   actions.children[0].handlers.click();assert(ids['product-dialog'].open);
+  const viewer=ids['product-dialog-content'].children[0];
+  const art=viewer.children[0];
+  art.style.setProperty=function(key,value){this[key]=value;};
+  const controls=viewer.children[1].children;
+  for(let i=0;i<4;i++)controls[2].handlers.click();
+  assert.equal(art.style['--rotate-y'],'50deg');
+  controls[1].handlers.click();assert.equal(art.style['--rotate-y'],'0deg');
+  controls[0].handlers.click();assert.equal(art.style['--rotate-y'],'-25deg');
+  art.handlers.pointermove({pointerType:'touch',clientX:200,clientY:0});
+  assert.equal(art.style['--rotate-y'],'-25deg');
+  art.handlers.pointermove({pointerType:'mouse',clientX:200,clientY:0});
+  assert.equal(art.style['--rotate-y'],'12deg');
+  assert.equal(art.style['--rotate-x'],'8deg');
+  art.handlers.pointerleave();assert.equal(art.style['--rotate-y'],'-25deg');
   ids['product-dialog'].querySelector('.dialog-close').handlers.click();assert(actions.children[0].focused);
   ids['product-search'].value='not found';ids['product-search'].handlers.input();assert.equal(ids['product-empty'].hidden,false);
   ids['clear-filters'].handlers.click();assert.equal(ids['product-grid'].children.length,2);
