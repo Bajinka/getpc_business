@@ -46,7 +46,12 @@ def transcribe(path, model_name, language):
         sys.exit(f"Could not load the Whisper model '{model_name}' ({type(e).__name__}: {e}).\n"
                  "The first run downloads it from huggingface.co, so this needs internet access. "
                  "Alternatively, burn captions from an existing file with --srt subs.srt.")
-    segments, info = model.transcribe(path, language=language, word_timestamps=True, vad_filter=True)
+    # Decode with ffmpeg ourselves: faster-whisper's own loader (PyAV) breaks across versions.
+    import numpy as np
+    raw = subprocess.run(["ffmpeg", "-nostdin", "-v", "error", "-i", path, "-vn", "-ac", "1", "-ar", "16000",
+                          "-f", "s16le", "-"], capture_output=True).stdout
+    audio = np.frombuffer(raw, np.int16).astype(np.float32) / 32768.0
+    segments, info = model.transcribe(audio, language=language, word_timestamps=True, vad_filter=True)
     words = []
     for seg in segments:
         for w in seg.words or []:
